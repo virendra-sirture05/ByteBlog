@@ -4,8 +4,27 @@ import { FileText, MessageCircle, Plus } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import RecentArticle from "./recent-article";
-
-const BlogDashboard = () => {
+import {prisma} from "@/lib/prisma"
+const BlogDashboard = async() => {
+  const [articles, totalComments] = await Promise.all([
+    prisma.articles.findMany({
+      orderBy:{
+        createdAt : "desc"
+      },
+      include:{
+        comments: true,
+        author:{
+          select:{
+            name : true,
+            email : true,
+            imageUrl : true
+          }
+        }
+      }
+    }),
+    prisma.comment.count()
+  ])
+  
   return (
     <div>
       <div className="flex justify-between px-8 py-8">
@@ -31,7 +50,7 @@ const BlogDashboard = () => {
                 <FileText className="w-4 h-4"/>
             </CardHeader>
             <CardContent>
-                <h2>2</h2>
+                <h2>{articles.length}</h2>
                 <div>+5 from last month</div>
             </CardContent>
         </Card>
@@ -41,7 +60,7 @@ const BlogDashboard = () => {
                 <MessageCircle className="w-4 h-4"/>
             </CardHeader>
             <CardContent>
-                <h2>3</h2>
+                <h2>{totalComments}</h2>
                 <div>12 awaiting moderation</div>
             </CardContent>
         </Card>
@@ -57,7 +76,7 @@ const BlogDashboard = () => {
         </Card>
       </div>
 
-      <RecentArticle/>
+      <RecentArticle articles={articles}  />
     </div>
   );
 };

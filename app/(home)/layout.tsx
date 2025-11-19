@@ -4,25 +4,31 @@ import React from 'react'
 
 const layout = async({children} : {children : React.ReactNode}) => {
     const user = await currentUser();
-    if(!user) return null;
-    const loggedInUser = await prisma.user.findUnique({
-        where:{
-            clerkUserId : user.id
-        }
-    })
-    if(!loggedInUser){
-        await prisma.user.create({
-            data:{
-                name : `${user.fullName} ${user.lastName}`,
-                clerkUserId : user.id,
-                email : user.emailAddresses[0].emailAddress,
-                imageUrl : user.imageUrl
+    
+    // ✅ User logged in hai to database me check/create karo
+    if(user) {
+        const loggedInUser = await prisma.user.findUnique({
+            where:{
+                clerkUserId : user.id
             }
         })
+        
+        if(!loggedInUser){
+            await prisma.user.create({
+                data:{
+                    name : `${user.firstName} ${user.lastName}`,
+                    clerkUserId : user.id,
+                    email : user.emailAddresses[0].emailAddress,
+                    imageUrl : user.imageUrl
+                }
+            })
+        }
     }
-  return (
-    <div>{children}</div>
-  )
+    
+    // ✅ Hamesha children return karo, logged in ho ya na ho
+    return (
+        <div>{children}</div>
+    )
 }
 
 export default layout
