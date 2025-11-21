@@ -5,6 +5,7 @@ import LikeButton from './like-button'
 import CommentInput from '../comments/comment-input'
 import CommentList from '../comments/comment-list'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@clerk/nextjs/server'
 
 
 type ArticleDetailsPageProps = {
@@ -36,6 +37,21 @@ const ArticleDetailsPage = async({article}: ArticleDetailsPageProps) => {
             }
         }
     })
+
+    const likes = await prisma.like.findMany({
+      where:{
+        articleId : article.id
+      }
+    })
+    const {userId} = await auth();
+    const user = await prisma.user.findUnique({
+      where : {
+        clerkUserId : userId as string
+      }
+    })
+
+    const isLiked : boolean = likes.some((like)=>like.userId == user?.id)
+
   return (
     <div className="min-h-screen bg-background">
         {/* Reuse your existing Navbar */}
@@ -77,7 +93,7 @@ const ArticleDetailsPage = async({article}: ArticleDetailsPageProps) => {
 
           {/* Like button  */}
 
-          <LikeButton />
+          <LikeButton articleId={article.id} likes={likes} isLiked={isLiked} />
 
           {/* comment input  */}
 

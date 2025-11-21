@@ -44,13 +44,13 @@ const DashboardSidebar = () => {
             Overview
           </Button>
         </Link>
-        <Link href={"/dashboard"}>
+        <Link href={"/dashboard/articles/create"}>
           <Button variant={'ghost'} className="w-full justify-start">
             <FileText className="w-5 h-5 mr-2" />
             Articles
           </Button>
         </Link>
-        <Link href={"/dashboard"}>
+        {/* <Link href={"/dashboard"}>
           <Button variant={'ghost'} className="w-full justify-start">
             <MessageCircle className="w-5 h-5 mr-2" />
             Comments
@@ -67,7 +67,7 @@ const DashboardSidebar = () => {
             <Settings className="w-5 h-5 mr-2" />
             Settings
           </Button>
-        </Link>
+        </Link> */}
       </nav>
     </div>
   );

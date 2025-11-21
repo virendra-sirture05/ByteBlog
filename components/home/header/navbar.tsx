@@ -7,6 +7,7 @@ import ToggleMode from "./toggle-mode";
 import { Menu, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SignedIn, SignedOut, SignIn, SignInButton, SignUp, SignUpButton, UserButton } from "@clerk/nextjs";
+import { searchAction } from "@/actions/search";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -22,7 +23,7 @@ const Navbar = () => {
                 <span className="bg-gradient-to-r from-purple-600 to bg-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent ">
                   Byte
                 </span>
-                <span className="text-foreground">Code</span>
+                <span className="text-foreground">Blog</span>
               </span>
             </Link>
           </div>
@@ -94,16 +95,17 @@ const Navbar = () => {
               <div className="absolute left-0 right-0 top-full bg-background/95 backdrop-blur-lg border-t shadow-lg">
                 <div className="container mx-auto py-6 space-y-6">
                   {/* Search Bar (Mobile) */}
-                  <div className="px-4">
+                  <form action={searchAction} className="px-4">
                     <div className="relative group">
                       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                       <Input
                         type="search"
+                        name="search"
                         placeholder="Search articles..."
                         className="pl-10 w-full h-11 bg-muted/50 border-muted-foreground/20 focus-visible:ring-2 focus-visible:ring-primary transition-all"
                       />
                     </div>
-                  </div>
+                  </form>
 
                   {/* Mobile Navigation Links */}
                   <nav className="px-4">
