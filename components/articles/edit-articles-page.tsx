@@ -59,8 +59,8 @@ const EditArticlesPage : React.FC<EditPropPage> = ({article}) => {
             <div className="mb-4">
               <Label htmlFor="title">Title</Label>
               <Input type="text" id="title" name="title" defaultValue={article.title} placeholder="Enter article title" />
-              {formstate.errors.title && (
-                <span className="text-red-500 text-sm">{formstate.error.title[0]}</span>
+              {formstate.errors?.title && (
+                <span className="text-red-500 text-sm">{formstate.errors.title[0]}</span>
               )}
             </div>
 
