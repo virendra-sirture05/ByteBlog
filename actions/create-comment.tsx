@@ -20,7 +20,7 @@ export const createComment = async(articleId :string, previousState : createComm
     const result = createCommentSchema.safeParse({body : formdata.get('body')});
     if(!result.success){
         return {
-            error : result.error.flatten().fieldErrors
+            errors : result.error.flatten().fieldErrors
         }
     }
     
