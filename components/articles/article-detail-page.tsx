@@ -7,58 +7,69 @@ import CommentList from '../comments/comment-list'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
 
-
 type ArticleDetailsPageProps = {
-    article : Prisma.ArticlesGetPayload<{
-        include : {
-            author : {
-                select : {
-                    name : true,
-                    email : true,
-                    imageUrl : true
-                }
-            }
+  article: Prisma.ArticlesGetPayload<{
+    include: {
+      author: {
+        select: {
+          name: true,
+          email: true,
+          imageUrl: true
         }
-    }>
+      }
+    }
+  }>
 }
-const ArticleDetailsPage = async({article}: ArticleDetailsPageProps) => {
 
-    const comments = await prisma.comment.findMany({
-        where : {
-            articleId : article.id
+const ArticleDetailsPage = async ({ article }: ArticleDetailsPageProps) => {
+
+  // 1. Fetch comments
+  const comments = await prisma.comment.findMany({
+    where: {
+      articleId: article.id,
+    },
+    include: {
+      author: {
+        select: {
+          name: true,
+          email: true,
+          imageUrl: true,
         },
-        include:{
-            author : {
-                select : {
-                    name : true,
-                    email : true,
-                    imageUrl : true
-                }
-            }
-        }
-    })
+      },
+    },
+  });
 
-    const likes = await prisma.like.findMany({
-      where:{
-        articleId : article.id
-      }
-    })
-    const {userId} = await auth();
-    const user = await prisma.user.findUnique({
-      where : {
-        clerkUserId : userId as string
-      }
-    })
+  // 2. Fetch likes
+  const likes = await prisma.like.findMany({
+    where: {
+      articleId: article.id,
+    },
+  });
 
-    const isLiked : boolean = likes.some((like)=>like.userId == user?.id)
+  // 3. Auth check (very important for Vercel SSR)
+  const { userId } = await auth();
+
+  // userId null ho sakta hai → crash avoid
+  let user = null;
+  if (userId) {
+    user = await prisma.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+  }
+
+  // 4. Determine if current user liked the article
+  const isLiked: boolean = user
+    ? likes.some((like) => like.userId === user.id)
+    : false;
 
   return (
     <div className="min-h-screen bg-background">
-        {/* Reuse your existing Navbar */}
-
       <main className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <article className="mx-auto max-w-3xl">
-            {/* Article Header */}
+
+          {/* Article Header */}
           <header className="mb-12">
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -72,40 +83,43 @@ const ArticleDetailsPage = async({article}: ArticleDetailsPageProps) => {
 
             <div className="flex items-center gap-4 text-muted-foreground">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={article.author.imageUrl as string} />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={article.author.imageUrl || ""} />
+                <AvatarFallback>AU</AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium text-foreground">
                   {article.author.name}
                 </p>
                 <p className="text-sm">
-                  {article.createdAt.toDateString()} · {12} min read
+                  {article.createdAt.toDateString()} · 12 min read
                 </p>
               </div>
             </div>
           </header>
-           {/* Article Content */}
+
+          {/* Article Content */}
           <section
             className="prose prose-lg dark:prose-invert max-w-none mb-12"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
 
-          {/* Like button  */}
+          {/* Like Button */}
+          <LikeButton
+            articleId={article.id}
+            likes={likes}
+            isLiked={isLiked}
+          />
 
-          <LikeButton articleId={article.id} likes={likes} isLiked={isLiked} />
-
-          {/* comment input  */}
-
+          {/* Comment Input */}
           <CommentInput articleId={article.id} />
 
-          {/* comment list  */}
-
+          {/* Comments List */}
           <CommentList comments={comments} />
+
         </article>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default ArticleDetailsPage
+export default ArticleDetailsPage;
