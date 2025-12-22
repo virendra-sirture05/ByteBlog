@@ -36,7 +36,7 @@ const Navbar = () => {
             >
               article
             </Link>
-            <Link
+            {/* <Link
               href={"/tutorial"}
               className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
             >
@@ -47,7 +47,7 @@ const Navbar = () => {
               className="text-sm font-medium text-foreground transition-colors hover:text-foreground"
             >
               about
-            </Link>
+            </Link> */}
             <Link
               href={"/dashboard"}
               className="text-sm font-medium text-foreground transition-colors hover:text-foreground"

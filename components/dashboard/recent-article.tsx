@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { Prisma } from "@/app/generated/prisma";
 import { deleteArticle } from "@/actions/delete-article";
+import { useUser } from "@clerk/nextjs"; // Clerk ka hook
 
 type RecentArticleProps = {
   articles: Prisma.ArticlesGetPayload<{
@@ -93,14 +94,27 @@ type Props = {
 };
 const DeleteButton: React.FC<Props> = ({ articleId }) => {
   const [isPending, startTransition] = useTransition();
+  const { isSignedIn, user } = useUser(); // Clerk hook
+
+  const handleDelete = () => {
+    // Check if user is logged in
+    if (!isSignedIn) {
+      alert("You need to login first!");
+      return;
+    }
+
+    startTransition(async () => {
+      if (confirm("Are you sure you want to delete?")) {
+        await deleteArticle(articleId);
+      }
+    });
+  };
+
   return (
     <form
-      action={() => {
-        startTransition(async () => {
-          if (confirm("are you sure you want to delete!")) {
-            await deleteArticle(articleId);
-          }
-        });
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleDelete();
       }}
     >
       <Button disabled={isPending} variant={"ghost"} type="submit">
