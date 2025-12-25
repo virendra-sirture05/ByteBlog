@@ -38,7 +38,7 @@ const RecentArticle: React.FC<RecentArticleProps> = ({ articles }) => {
         <CardHeader>
           <div className="flex justify-between">
             <CardTitle>Recent Article</CardTitle>
-            <Button>View All →</Button>
+            <Link href={'/articles'}>View All →</Link>
           </div>
         </CardHeader>
         {!articles.length ? (

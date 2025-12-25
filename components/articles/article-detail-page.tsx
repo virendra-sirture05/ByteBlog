@@ -1,28 +1,27 @@
-import { Prisma } from '@/app/generated/prisma'
-import React from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import LikeButton from './like-button'
-import CommentInput from '../comments/comment-input'
-import CommentList from '../comments/comment-list'
-import { prisma } from '@/lib/prisma'
-import { auth } from '@clerk/nextjs/server'
+import { Prisma } from "@/app/generated/prisma";
+import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import LikeButton from "./like-button";
+import CommentInput from "../comments/comment-input";
+import CommentList from "../comments/comment-list";
+import { prisma } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 type ArticleDetailsPageProps = {
   article: Prisma.ArticlesGetPayload<{
     include: {
       author: {
         select: {
-          name: true,
-          email: true,
-          imageUrl: true
-        }
-      }
-    }
-  }>
-}
+          name: true;
+          email: true;
+          imageUrl: true;
+        };
+      };
+    };
+  }>;
+};
 
 const ArticleDetailsPage = async ({ article }: ArticleDetailsPageProps) => {
-
   // 1. Fetch comments
   const comments = await prisma.comment.findMany({
     where: {
@@ -68,7 +67,6 @@ const ArticleDetailsPage = async ({ article }: ArticleDetailsPageProps) => {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <article className="mx-auto max-w-3xl">
-
           {/* Article Header */}
           <header className="mb-12">
             <div className="flex flex-wrap gap-2 mb-4">
@@ -99,23 +97,35 @@ const ArticleDetailsPage = async ({ article }: ArticleDetailsPageProps) => {
 
           {/* Article Content */}
           <section
-            className="prose prose-lg dark:prose-invert max-w-none mb-12"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
+            className="
+    prose prose-lg dark:prose-invert
+    max-w-none
+    mb-12
+    overflow-hidden
+    break-words
+
+    prose-img:max-w-full
+    prose-img:h-auto
+    prose-img:rounded-lg
+    prose-img:mx-auto
+
+    prose-pre:overflow-x-auto
+    prose-pre:max-w-full
+
+    prose-code:break-words
+  "
+          >
+            <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          </section>
 
           {/* Like Button */}
-          <LikeButton
-            articleId={article.id}
-            likes={likes}
-            isLiked={isLiked}
-          />
+          <LikeButton articleId={article.id} likes={likes} isLiked={isLiked} />
 
           {/* Comment Input */}
           <CommentInput articleId={article.id} />
 
           {/* Comments List */}
           <CommentList comments={comments} />
-
         </article>
       </main>
     </div>
